@@ -50,10 +50,13 @@ def test_pack_scaling_on_off():
 def test_signal_conversion():
     signal = SPEED_SIGNAL
     unscaled_bin = signal.to_bin(963, rescale=False)
-    assert unscaled_bin == '01111000011'
-
     scaled_bin = signal.to_bin(96.3, rescale=True)
-    assert scaled_bin == '01111000011'
+
+    expected_bin_string = '01111000011'
+    expected = [int(b) for b in expected_bin_string]
+
+    assert unscaled_bin == expected    
+    assert scaled_bin == expected
 
     with pytest.raises(ValueError):
         signal.to_bin(96.3, rescale=False)

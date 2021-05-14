@@ -25,7 +25,7 @@ class CanSignal:
             if not isinstance(dec_val, int):
                 raise ValueError
             int_value = dec_val
-        bits = int_to_bitstring(int_value, self.length)
+        bits = int_to_bitsequence(int_value, self.length)
         return bits
 
     def to_dec(self, binary):
@@ -37,11 +37,11 @@ class Frame:
 
     def __init__(self, data=0, bytes=8):
         length = bytes * 8
-        bits = int_to_bitstring(data, length)
+        bits = int_to_bitsequence(data, length)
         bytes = []
         for byte_start in range(0, length, 8):
-            byte_str = bits[byte_start: byte_start+8]
-            byte = [int(b) for b in reversed(byte_str)]
+            byte = bits[byte_start: byte_start+8]
+            byte.reverse()
             bytes.append(byte)
         self.bytes = bytes
 
@@ -72,7 +72,7 @@ class Frame:
         # reversing bit sequence to write least significants first
         for bit in reversed(bits):
             byte = self.bytes[byte_index]
-            byte[bit_index] = int(bit)
+            byte[bit_index] = bit
             bit_index += 1
 
             # switching which byte to write to
@@ -86,7 +86,6 @@ class Frame:
         return f'Frame(data={hex}, bytes={num_bytes})'
 
     def to_hex(self):
-        # reverse?
         bits = []
         for byte in self.bytes:
             bits.extend(map(str, reversed(byte)))
@@ -94,9 +93,8 @@ class Frame:
         dec = int(binary, 2)
         return hex(dec)
 
-def int_to_bitstring(value, length=None):
-    #TODO: why return a strings and not list of ints? Every use case except tests convert to list of ints
+def int_to_bitsequence(value, length=None):
     bits = format(value, 'b')
     if length:
         bits = bits.zfill(length)
-    return bits
+    return [int(b) for b in bits]
