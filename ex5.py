@@ -11,14 +11,13 @@ class CanSignal:
     unit: str = ''
 
     def to_bin(self, dec_val, rescale=True):
-        """Converts a measured value to a bitstring according to signal specifications:
+        """Converts a measured value to a binary sequence following signal specifications:
             * Pads with leading zeros to match the signals <length>
             * If rescale=True: Converts the <dec_val> according to <factor> and <offset>
             * If rescale=False: <dec_val> is expected to be converted already. If not given an int, raises ValueError
         
         The bit order is given with msb first.
         """
-
         if rescale:
             int_value = round((dec_val - self.offset) / self.factor)
         else:
@@ -28,8 +27,13 @@ class CanSignal:
         bits = int_to_bitsequence(int_value, self.length)
         return bits
 
-    def to_dec(self, binary):
-        pass
+    def to_dec(self, bits, rescale=True):
+        binary = ''.join(str(b) for b in bits)
+        value = int(binary, 2)
+        if rescale:
+            value = self.factor * value + self.offset
+            value = round(value, 2)
+        return {'value': value, 'unit': self.unit}
 
 
 class Frame:
@@ -44,6 +48,19 @@ class Frame:
             byte.reverse()
             bytes.append(byte)
         self.bytes = bytes
+
+    def __repr__(self):
+        hex = self.to_hex()
+        num_bytes = len(self.bytes)
+        return f'Frame(data={hex}, bytes={num_bytes})'
+
+    def to_hex(self):
+        bits = []
+        for byte in self.bytes:
+            bits.extend(map(str, reversed(byte)))
+        binary = ''.join(bits)
+        dec = int(binary, 2)
+        return hex(dec)
 
     def display(self, print_it=True):
         mirrored_bits = []
@@ -79,19 +96,30 @@ class Frame:
             if bit_index == 8:
                 bit_index = 0
                 byte_index += byte_step
-    
-    def __repr__(self):
-        hex = self.to_hex()
-        num_bytes = len(self.bytes)
-        return f'Frame(data={hex}, bytes={num_bytes})'
 
-    def to_hex(self):
+    def unpack(self, signal, rescale=True):
+        byte_index, bit_index = divmod(signal.start_bit, 8)
+
+        if signal.byte_order == 'motorola':
+            byte_step = -1
+        else:
+            byte_step = 1
+
         bits = []
-        for byte in self.bytes:
-            bits.extend(map(str, reversed(byte)))
-        binary = ''.join(bits)
-        dec = int(binary, 2)
-        return hex(dec)
+        for _ in range(signal.length):
+            byte = self.bytes[byte_index]
+            bits.append(byte[bit_index])
+            bit_index += 1
+            if bit_index == 8:
+                bit_index = 0
+                byte_index += byte_step
+        
+        # reverse bit order to get msb first
+        bits.reverse()
+        return signal.to_dec(bits, rescale=rescale)
+
+
+
 
 def int_to_bitsequence(value, length=None):
     bits = format(value, 'b')
