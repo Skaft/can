@@ -1,42 +1,7 @@
-from dataclasses import dataclass
+from helpers import int_to_bitsequence
 
 
-@dataclass(frozen=True)
-class CanSignal:
-    start_bit: int
-    length: int
-    byte_order: str = 'motorola'
-    offset: int = 0
-    factor: float = 1.0
-    unit: str = ''
-
-    def to_bin(self, dec_val, rescale=True):
-        """Converts a measured value to a binary sequence following signal specifications:
-            * Pads with leading zeros to match the signals <length>
-            * If rescale=True: Converts the <dec_val> according to <factor> and <offset>
-            * If rescale=False: <dec_val> is expected to be converted already. If not given an int, raises ValueError
-        
-        The bit order is given with msb first.
-        """
-        if rescale:
-            int_value = round((dec_val - self.offset) / self.factor)
-        else:
-            if not isinstance(dec_val, int):
-                raise ValueError
-            int_value = dec_val
-        bits = int_to_bitsequence(int_value, self.length)
-        return bits
-
-    def to_dec(self, bits, rescale=True):
-        binary = ''.join(str(b) for b in bits)
-        value = int(binary, 2)
-        if rescale:
-            value = self.factor * value + self.offset
-            value = round(value, 2)
-        return {'value': value, 'unit': self.unit}
-
-
-class Frame:
+class DataField:
     """A representation of a CAN data field."""
 
     def __init__(self, data=0, bytes=8):
@@ -52,7 +17,7 @@ class Frame:
     def __repr__(self):
         hex = self.to_hex()
         num_bytes = len(self.bytes)
-        return f'Frame(data={hex}, bytes={num_bytes})'
+        return f'DataField(data={hex}, bytes={num_bytes})'
 
     def to_hex(self):
         bits = []
@@ -117,12 +82,3 @@ class Frame:
         # reverse bit order to get msb first
         bits.reverse()
         return signal.to_dec(bits, rescale=rescale)
-
-
-
-
-def int_to_bitsequence(value, length=None):
-    bits = format(value, 'b')
-    if length:
-        bits = bits.zfill(length)
-    return [int(b) for b in bits]
