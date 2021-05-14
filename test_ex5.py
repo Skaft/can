@@ -13,40 +13,38 @@ TEST_DATA = {
 
 def test_building_frame():
     empty_frame = [[0] * 8 for _ in range(8)]
-    assert make_frame() == empty_frame
+    assert Frame().bytes == empty_frame
 
     data = TEST_DATA['data']
     expected_display = TEST_DATA['display']
 
     data_length = ceil(data.bit_length() / 8)
-    filled_frame = make_frame(data, bytes=data_length)
-    display = display_frame(filled_frame, print_it=False)
+    filled_frame = Frame(data, bytes=data_length)
+    display = filled_frame.display(print_it=False)
 
     assert display == expected_display
 
 
 def test_displaying_frame():
-    byte1 = [0,1,0,0,0,0,0,1]
-    expected_disp1 = '10000010'
+    byte1 = '01000001'
+    byte2 = '10001000'
 
-    byte2 = [1,0,0,0,1,0,0,0]
-    expected_disp2 = '00010001'
+    binary = (byte1 + byte2) * 4
+    frame = Frame(int(binary, 2))
+    expected_display = '\n'.join([byte1, byte2] * 4)
 
-    frame = [byte1, byte2] * 4
-    expected_display = '\n'.join([expected_disp1, expected_disp2] * 4)
-
-    display = display_frame(frame, print_it=False)
+    display = frame.display(print_it=False)
     assert display == expected_display
 
 
 def test_pack_scaling_on_off():
-    frame_1 = make_frame(data=0, bytes=8)
-    pack_signal(frame_1, SPEED_SIGNAL, 96.3, rescale=True)
+    frame_1 = Frame(data=0, bytes=8)
+    frame_1.pack(SPEED_SIGNAL, 96.3, rescale=True)
 
-    frame_2 = make_frame(data=0, bytes=8)
-    pack_signal(frame_2, SPEED_SIGNAL, 963, rescale=False)
+    frame_2 = Frame(data=0, bytes=8)
+    frame_2.pack(SPEED_SIGNAL, 963, rescale=False)
 
-    assert frame_1 == frame_2
+    assert frame_1.bytes == frame_2.bytes
 
 
 def test_signal_conversion():
@@ -62,17 +60,17 @@ def test_signal_conversion():
 
 
 def test_pack_speed():
-    frame = make_frame(data=0, bytes=8)
-    pack_signal(frame, SPEED_SIGNAL, 96.3)
+    frame = Frame(data=0, bytes=8)
+    frame.pack(SPEED_SIGNAL, 96.3)
     expected = '00000000\n00000000\n00000000\n00000000\n00011110\n00011000\n00000000\n00000000'
-    result = display_frame(frame, print_it=False)
+    result = frame.display(print_it=False)
     assert result == expected
     
 def test_pack_rpm():
-    frame = make_frame(data=0, bytes=8)
-    pack_signal(frame, RPM_SIGNAL, 14431)
+    frame = Frame(data=0, bytes=8)
+    frame.pack(RPM_SIGNAL, 14431)
     expected = '00000000\n00000000\n11100001\n01111100\n00000000\n00000000\n00000000\n00000000'
-    result = display_frame(frame, print_it=False)
+    result = frame.display(print_it=False)
     assert result == expected
 
 # def test_unpack_speed():
