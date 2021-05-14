@@ -10,7 +10,6 @@ class DataField:
         bytes = []
         for byte_start in range(0, length, 8):
             byte = bits[byte_start: byte_start+8]
-            byte.reverse()
             bytes.append(byte)
         self.bytes = bytes
 
@@ -22,17 +21,17 @@ class DataField:
     def to_hex(self):
         bits = []
         for byte in self.bytes:
-            bits.extend(map(str, reversed(byte)))
+            bits.extend(map(str, byte))
         binary = ''.join(bits)
         dec = int(binary, 2)
         return hex(dec)
 
     def display(self, print_it=True):
-        mirrored_bits = []
+        bitstrings = []
         for byte in self.bytes:
-            reversed_bitstring = ''.join(str(b) for b in reversed(byte))
-            mirrored_bits.append(reversed_bitstring)
-        output = '\n'.join(mirrored_bits)
+            bitstring = ''.join(str(b) for b in byte)
+            bitstrings.append(bitstring)
+        output = '\n'.join(bitstrings)
         if print_it:
             print(output)
         else:
@@ -40,8 +39,9 @@ class DataField:
 
     def pack(self, signal, value, rescale=True):
         # converting start bit number to specific byte and position within that byte
-        byte_index, bit_index = divmod(signal.start_bit, 8)
-
+        byte_index = signal.start_bit // 8
+        bit_index = 8 * (byte_index + 1) - 1 - signal.start_bit
+        
         # the bit sequence to write
         bits = signal.to_bin(value, rescale=rescale)
 
@@ -55,15 +55,16 @@ class DataField:
         for bit in reversed(bits):
             byte = self.bytes[byte_index]
             byte[bit_index] = bit
-            bit_index += 1
+            bit_index -= 1
 
             # switching which byte to write to
-            if bit_index == 8:
-                bit_index = 0
+            if bit_index == -1:
+                bit_index = 7
                 byte_index += byte_step
 
     def unpack(self, signal, rescale=True):
-        byte_index, bit_index = divmod(signal.start_bit, 8)
+        byte_index = signal.start_bit // 8
+        bit_index = 8 * (byte_index + 1) - 1 - signal.start_bit
 
         if signal.byte_order == 'motorola':
             byte_step = -1
@@ -74,11 +75,11 @@ class DataField:
         for _ in range(signal.length):
             byte = self.bytes[byte_index]
             bits.append(byte[bit_index])
-            bit_index += 1
-            if bit_index == 8:
-                bit_index = 0
+            bit_index -= 1
+            if bit_index == -1:
+                bit_index = 7
                 byte_index += byte_step
-        
+
         # reverse bit order to get msb first
         bits.reverse()
         return signal.to_dec(bits, rescale=rescale)
