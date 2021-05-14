@@ -76,5 +76,12 @@ def test_pack_rpm():
     result = frame.display(print_it=False)
     assert result == expected
 
-# def test_unpack_speed():
-#     frame = make_frame(TEST_DATA['data'], bytes=8)
+def test_unpack_speed():
+    frame = Frame(TEST_DATA['data'], bytes=8)
+    speed = frame.unpack(SPEED_SIGNAL)
+    assert speed == {'value': 96.3, 'unit': 'km/h'}
+
+def test_unpack_rpm():
+    frame = Frame(TEST_DATA['data'], bytes=8)
+    speed = frame.unpack(RPM_SIGNAL)
+    assert speed == {'value': 14431, 'unit': 'rpm'}
