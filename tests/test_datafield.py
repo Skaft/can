@@ -3,8 +3,7 @@ from math import ceil
 import pytest
 
 from can.datafield import DataField
-from can.signals import *
-
+from tests.utils import SPEED_SIGNAL, RPM_SIGNAL
 
 TEST_DATA = {
     "data": 0xEE67E17D9E1F0A3B,

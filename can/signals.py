@@ -36,7 +36,3 @@ class CanSignal:
             value = self.factor * value + self.offset
             value = round(value, 2)
         return {"value": value, "unit": self.unit}
-
-
-SPEED_SIGNAL = CanSignal(start_bit=43, length=11, factor=0.1, unit="km/h")
-RPM_SIGNAL = CanSignal(start_bit=26, length=14, unit="RPM")
