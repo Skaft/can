@@ -9,29 +9,29 @@ class DataField:
         bits = int_to_bitsequence(data, length)
         bytes = []
         for byte_start in range(0, length, 8):
-            byte = bits[byte_start: byte_start+8]
+            byte = bits[byte_start : byte_start + 8]
             bytes.append(byte)
         self.bytes = bytes
 
     def __repr__(self):
         hex = self.to_hex()
         num_bytes = len(self.bytes)
-        return f'DataField(data={hex}, bytes={num_bytes})'
+        return f"DataField(data={hex}, bytes={num_bytes})"
 
     def to_hex(self):
         bits = []
         for byte in self.bytes:
             bits.extend(map(str, byte))
-        binary = ''.join(bits)
+        binary = "".join(bits)
         dec = int(binary, 2)
         return hex(dec)
 
     def display(self, print_it=True):
         bitstrings = []
         for byte in self.bytes:
-            bitstring = ''.join(str(b) for b in byte)
+            bitstring = "".join(str(b) for b in byte)
             bitstrings.append(bitstring)
-        output = '\n'.join(bitstrings)
+        output = "\n".join(bitstrings)
         if print_it:
             print(output)
         else:
@@ -41,12 +41,12 @@ class DataField:
         # converting start bit number to specific byte and position within that byte
         byte_index = signal.start_bit // 8
         bit_index = 8 * (byte_index + 1) - 1 - signal.start_bit
-        
+
         # the bit sequence to write
         bits = signal.to_bin(value, rescale=rescale)
 
         # whether to iterate bytes upwards or downwards
-        if signal.byte_order == 'motorola':
+        if signal.byte_order == "motorola":
             byte_step = -1
         else:
             byte_step = 1
@@ -66,7 +66,7 @@ class DataField:
         byte_index = signal.start_bit // 8
         bit_index = 8 * (byte_index + 1) - 1 - signal.start_bit
 
-        if signal.byte_order == 'motorola':
+        if signal.byte_order == "motorola":
             byte_step = -1
         else:
             byte_step = 1

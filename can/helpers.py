@@ -2,7 +2,7 @@ from itertools import groupby
 
 
 def int_to_bitsequence(value, length=None):
-    bits = format(value, 'b')
+    bits = format(value, "b")
     if length:
         bits = bits.zfill(length)
     return [int(b) for b in bits]
@@ -20,4 +20,4 @@ def pad_sequence(intlist, max_width=5):
         tail = [opposite] + intlist[cutoff:]
     else:
         tail = intlist[cutoff:]
-    return head + pad_sequence(tail)    
+    return head + pad_sequence(tail)
