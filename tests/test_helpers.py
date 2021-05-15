@@ -1,4 +1,12 @@
-from can.helpers import pad_sequence
+from can.helpers import pad_sequence, int_to_bitsequence
+
+
+def test_make_simple_bitsequence():
+    assert int_to_bitsequence(10) == [1, 0, 1, 0]
+
+
+def test_make_padded_bitsequence():
+    assert int_to_bitsequence(10, length=7) == [0, 0, 0, 1, 0, 1, 0]
 
 
 def test_simple_bit_stuffing():
