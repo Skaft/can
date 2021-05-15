@@ -4,7 +4,7 @@ from helpers import int_to_bitsequence, pad_sequence
 class BaseFrame:
     def __init__(self, identifier, payload, num_bytes):
         self.fields = {
-            'sof': [1],
+            'sof': [0],
             'identifier': int_to_bitsequence(identifier, 11),
             'rtr': [0],
             'ide': [0],
