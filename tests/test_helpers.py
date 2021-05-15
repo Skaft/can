@@ -1,4 +1,4 @@
-from helpers import pad_sequence
+from can.helpers import pad_sequence
 
 
 def test_simple_bit_stuffing():

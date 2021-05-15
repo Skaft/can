@@ -1,4 +1,4 @@
-from helpers import int_to_bitsequence
+from can.helpers import int_to_bitsequence
 
 
 class DataField:

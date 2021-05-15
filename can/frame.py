@@ -1,4 +1,4 @@
-from helpers import int_to_bitsequence, pad_sequence
+from can.helpers import int_to_bitsequence, pad_sequence
 
 
 class BaseFrame:

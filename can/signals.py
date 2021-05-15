@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from helpers import int_to_bitsequence
+from can.helpers import int_to_bitsequence
 
 
 @dataclass(frozen=True)

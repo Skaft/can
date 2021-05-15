@@ -2,8 +2,8 @@ from math import ceil
 
 import pytest
 
-from datafield import DataField
-from signals import *
+from can.datafield import DataField
+from can.signals import *
 
 
 TEST_DATA = {
