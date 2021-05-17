@@ -50,20 +50,6 @@ def test_pack_scaling_on_off(empty_field_gen):
     assert field_1.bytes == field_2.bytes
 
 
-def test_signal_conversion():
-    signal = SPEED_SIGNAL
-    unscaled_bin = signal.to_bin(963, rescale=False)
-    scaled_bin = signal.to_bin(96.3, rescale=True)
-
-    expected = [int(b) for b in "01111000011"]
-
-    assert unscaled_bin == expected
-    assert scaled_bin == expected
-
-    with pytest.raises(ValueError):
-        signal.to_bin(96.3, rescale=False)
-
-
 def test_pack_speed(empty_field, empty_bytestrings):
     empty_field.pack(SPEED_SIGNAL, 96.3)
     result = empty_field.display(print_it=False)
