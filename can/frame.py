@@ -2,6 +2,8 @@ from can.helpers import int_to_bitsequence, pad_sequence
 
 
 class BaseFrame:
+    """A quick, ugly docstring for testing things out"""
+
     def __init__(self, identifier, payload, num_bytes, use_crc=False):
         self.fields = {
             "sof": [0],
